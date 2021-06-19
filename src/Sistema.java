@@ -28,7 +28,7 @@ public class Sistema {
                     final Duration duracao = Duration.ofMillis(new Date().getTime() - hoje.getTime());
                     final long hora = duracao.toHours();
                     final long minutos = duracao.toMinutes();
-                    final long segundos = duracao.toSeconds();
+                    final long segundos = duracao.getSeconds();
                     final String tempo =  hora + ":" + minutos + ":" + segundos;
 
                     String vitoria;
@@ -85,14 +85,14 @@ public class Sistema {
     }
 
     private void exibirHistorico(){
-        File file = new File("C:\\Users\\pankaj\\Desktop\\test.txt");
+        File file = new File("historico.txt");
         Scanner sc = null;
         try {
             sc = new Scanner(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-
+        System.out.println("Histórico: \n");
         while (true){
             assert sc != null;
             if (!sc.hasNextLine()) break;

@@ -67,6 +67,7 @@ public class CampoMinado extends Sistema {
 
     //Função que mostra a matrix settada anteriormente para o usuário.
     private void mostraJogo() {
+        String linhas = "-";
         System.out.print("     ");
         //Loop para colocar os números da coordenada x no topo da matriz.
         for (int i = 0; i < tela[0].length; i++) {
@@ -76,7 +77,12 @@ public class CampoMinado extends Sistema {
                 System.out.print(i + "  ");
             }
         }
-        System.out.println("\n   ---------------------------------------------------------------------------------------------");
+        System.out.print("\n   -");
+        for (int i = 0; i < tela[0].length; i++) {
+            System.out.print("----");
+        }
+        System.out.print("\n");
+
         //Loop para colocar os números da coordenada y no canto esquerdo da matriz.
         for (int i = 0; i < tela.length; i++) {
             if (i < 10) {
