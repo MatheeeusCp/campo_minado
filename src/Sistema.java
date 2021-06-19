@@ -1,10 +1,10 @@
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.Date;
 import java.util.Scanner;
 import java.io.FileWriter;
-import java.io.BufferedReader;
 
 public class Sistema {
     public Sistema() {
@@ -85,12 +85,20 @@ public class Sistema {
     }
 
     private void exibirHistorico(){
-    BufferedReader br = new BufferedReader(new FileReader("historico.txt"));
+        File file = new File("C:\\Users\\pankaj\\Desktop\\test.txt");
+        Scanner sc = null;
+        try {
+            sc = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
 
-    String st;
-    while ((st = br.readLine()) != null)
-            System.out.println(st);
-}
+        while (true){
+            assert sc != null;
+            if (!sc.hasNextLine()) break;
+            System.out.println(sc.nextLine());
+        }
+    }
 
     private void limparHistorico() {
         try {
