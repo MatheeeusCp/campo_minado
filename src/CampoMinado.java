@@ -1,5 +1,4 @@
 import java.util.Scanner;
-import java.util.SimpleTimeZone;
 
 public class CampoMinado extends Sistema {
     public CampoMinado(int dificuldade, Scanner teclado) {
@@ -25,13 +24,13 @@ public class CampoMinado extends Sistema {
 
         iniciaJogo();
     }
-    int vitoria = 0;
     private final Scanner teclado;
     private final int numeroBombas;
-    private Quadrado[][] jogoReal; //Essa matriz será utilizada para desenvolver a lógica do jogo.
+    private final Quadrado[][] jogoReal; //Essa matriz será utilizada para desenvolver a lógica do jogo.
     private final Quadrado[][] tela; //Essa m// atriz será a mostrada para o usuário.
 
-    private int ganhou = 0;
+    private int quadradosValidados = 0; //Variável para guardar a quantidade de casas que foram validadas na matriz
+    int vitoria = 0; //Variável para guardar se o usuário ganhou ou perdeu, e retornar esse informação posteriormente
 
     //Função que setta a matriz do campo minado para o usuário.
     private void iniciaJogo() {
@@ -56,15 +55,53 @@ public class CampoMinado extends Sistema {
         for (int i = 0; i < numeroBombas; i++) {
             final int x = (int) (jogoReal.length * Math.random());
             final int y = (int) (jogoReal[0].length * Math.random());
-
+            //Se, por um acaso, houver a tentativa de colocar uma bomba em cima da outra, isso não será permitido.
             if (!jogoReal[x][y].getValor().equals("*")) {
                 jogoReal[x][y].setValor("*");
+            }else{
+                i--;
             }
         }
 
         menuJogo();
     }
 
+    private void menuJogo() {
+        int linha = 0;
+        int coluna = 0;
+        int i = -1;
+        while (i != 0) {
+            mostraJogo(); //Printa o a matriz para o usuário
+            System.out.println("\n-------------------------");
+            //Coleta de linha e coluna da jogada do usuário
+            linha = menuLinha();
+            coluna = menuColuna();
+
+            final boolean validado = validaCampos(linha, coluna); //Valida se os valores digitados são válidos ou se o
+            //campo escolhido já foi utilizado anteriormente.
+
+
+            if (validado) {
+                //Se os valores são válidos, valida se há uma bomba no local desejado.
+                if (jogoReal[linha][coluna].getValor().equals("*")) {
+                    vocePerdeu();//Setta o ambiente de jogo onde o usuário perde.
+                    i = 0;
+                } else {
+                    verificarBombas(linha, coluna);//Se não tem uma bomba, entra nessa lógica central do sistema
+                    //que faz a validação da quantidade de bombas ao redor do local selecionado pelo usuário.
+
+                    //Se a quantidade de quadrados validados for o valor de quantidade de quadrados da matriz-bombas
+                    //significa que o usuário ganhou.
+                    if (quadradosValidados == (jogoReal.length * jogoReal[0].length - numeroBombas)) {
+                        voceGanhou();//Setta o ambiente de jogo onde o usuário ganha.
+                        i = 0;
+                    }
+                }
+            } else {
+                System.out.println("Tente mais uma vez\n");
+            }
+        }
+    }
     //Função que mostra a matrix settada anteriormente para o usuário.
     private void mostraJogo() {
         String linhas = "-";
@@ -96,51 +133,6 @@ public class CampoMinado extends Sistema {
             }
             System.out.println();
         }
-    }
-
-    private void menuJogo() {
-        int linha = 0;
-        int coluna = 0;
-        int i = -1;
-        while (i != 0) {
-            mostraJogo();
-            System.out.println("\n-------------------------");
-
-            linha = menuLinha();
-            coluna = menuColuna();
-
-            final boolean validado = validaCampos(linha, coluna);
-
-
-            if (validado) {
-                if (jogoReal[linha][coluna].getValor().equals("*")) {
-                    vocePerdeu();
-                    i = 0;
-                } else {
-                    verificarBombas(linha, coluna);
-                    if (ganhou == (jogoReal.length * jogoReal[0].length - numeroBombas)) {
-                        voceGanhou();
-                        i = 0;
-                    }
-                }
-            } else {
-                System.out.println("Tente mais uma vez\n");
-            }
-        }
-    }
-
-    private void vocePerdeu() {
-        System.out.println("");
-        System.out.println("Você PERDEU!");
-        abrirCampo();
-        mostraJogo();
-    }
-
-    private void voceGanhou() {
-        vitoria = 1;
-        System.out.println("");
-        System.out.println("Você GANHOU!");
-        mostraJogo();
     }
 
     private int menuLinha() {
@@ -193,6 +185,20 @@ public class CampoMinado extends Sistema {
         return true;
     }
 
+    private void vocePerdeu() {
+        System.out.println("");
+        System.out.println("Você PERDEU!");
+        abrirCampo();//Abre todos campos da matriz
+        mostraJogo();//Mostra a matriz para o usuário
+    }
+
+    private void voceGanhou() {
+        vitoria = 1;
+        System.out.println("");
+        System.out.println("Você GANHOU!");
+        mostraJogo();//Mostra a matriz para o usuário
+    }
+
     private void verificarBombas(int linha, int coluna) {
         if (jogoReal[linha][coluna].isValidado()) {
             return;
@@ -204,7 +210,8 @@ public class CampoMinado extends Sistema {
         int minColuna;
         int maxColuna;
 
-
+        //Faz algumas validações para garantir que os quadrados a serem validados são os quadrados ao redor do quadrado
+        //selecionado
         if (linha != 0 && linha != jogoReal.length - 1) {
             minLinha = linha - 1;
             maxLinha = linha + 1;
@@ -227,6 +234,7 @@ public class CampoMinado extends Sistema {
             maxColuna = coluna;
         }
 
+        //Valida se há alguma bomba ao redor do local selecionado e atribui a variável bombas
         for (int i = minLinha; i <= maxLinha; i++) {
             for (int j = minColuna; j <= maxColuna; j++) {
                 if (jogoReal[i][j].getValor().equals("*")) {
@@ -235,12 +243,18 @@ public class CampoMinado extends Sistema {
             }
         }
 
+        //Setta, em ambas as matrizes, o valor de bombas no local escolhido e também setta o atributo "validado"
+        //como true no quadrado, para não ser validado novamente.
         tela[linha][coluna].setValor(String.valueOf(bombas));
         tela[linha][coluna].setValidado(true);
         jogoReal[linha][coluna].setValor(String.valueOf(bombas));
         jogoReal[linha][coluna].setValidado(true);
-        ganhou++;
+        //Guardamos a quantidade de quadrados validados para definir se o usuário ganhou ou não o jogo.
+        quadradosValidados++;
 
+        //Se a quantidade de bombas que foram encontradas ao redor do quadrado escolhido foi de 0, fazemos a mesma
+        //validação só que com as bombas ao redor da atual validada, entrando em um loop de validação até uma área de
+        //quadrados vazios for descoberta.
         if (bombas == 0) {
             for (int i = minLinha; i <= maxLinha; i++) {
                 for (int j = minColuna; j <= maxColuna; j++) {
@@ -255,13 +269,15 @@ public class CampoMinado extends Sistema {
     }
 
     private void abrirCampo() {
+        //Percorre toda a matriz abrindo os campos.
         for (int x = 0; x < jogoReal.length; x++) {
             for (int y = 0; y < jogoReal[0].length; y++) {
                 if (jogoReal[x][y].getValor().equals("*")) {
                     tela[x][y].setValor("*");
                     continue;
                 }
-
+                //É uma versão reduzida do método "verificarBombas", que passa casa a casa revelando a quantidade de
+                //bombas presente ao redor das coordenadas;
                 descobrirCampos(x, y);
             }
         }

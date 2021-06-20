@@ -13,13 +13,14 @@ public class Sistema {
 
     private final Scanner teclado;
 
+    //Método de inicialização do jogo.
     public void iniciar() {
         int escolha = -1;
         while (escolha != 0) {
             escolha = menu();
             switch(escolha) {
                 case 1:
-                    final Date hoje = new Date();
+                    final Date hoje = new Date(); //Variável criada para guardar a data e instante em que o usuário iniciou o jogo.
                     int[] retornoJogo = novoJogo(); //Retorna na primeira posicao se foi vitoria e na segunda posicao a dificuldade
 
                     final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -29,7 +30,7 @@ public class Sistema {
                     final long hora = duracao.toHours();
                     final long minutos = duracao.toMinutes();
                     final long segundos = duracao.getSeconds();
-                    final String tempo =  hora + ":" + minutos + ":" + segundos;
+                    final String tempo =  hora + ":" + minutos + ":" + segundos; //Duração do jogo
 
                     String vitoria;
                     if (retornoJogo[0] == 1){
@@ -81,6 +82,58 @@ public class Sistema {
                     System.out.println("\nTente mais uma vez");
                     break;
             }
+        }
+    }
+
+    private int[] novoJogo() {
+        int escolha = -1;
+
+        int vitoria = 0;
+        int dificuldade = 0;
+        int [] retorno = new int[2];
+
+        while(escolha != 0) {
+            escolha = menuNovoJogo();
+            dificuldade = escolha;
+            switch (escolha) {
+                case 1:
+                    CampoMinado campo1 = new CampoMinado(1, teclado);
+                    vitoria = campo1.vitoria;
+                    escolha = 0;
+                    break;
+                case 2:
+                    CampoMinado campo2 = new CampoMinado(2, teclado);
+                    vitoria = campo2.vitoria;
+                    escolha = 0;
+                    break;
+                case 3:
+                    CampoMinado campo3 = new CampoMinado(3, teclado);
+                    vitoria = campo3.vitoria;
+                    escolha = 0;
+                    break;
+                case -1:
+                    break;
+                default:
+                    System.out.println("\nTente mais uma vez");
+                    break;
+            }
+        }
+        retorno[0] = vitoria;
+        retorno[1] = dificuldade;
+        return retorno;
+    }
+
+    private int menuNovoJogo() {
+        System.out.println("---------------------------------");
+        System.out.println("1 - Fácil");
+        System.out.println("2 - Médio");
+        System.out.println("3 - Difícil");
+
+        try {
+            return Integer.parseInt(teclado.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("\nTente mais uma vez");
+            return -1;
         }
     }
 
@@ -144,55 +197,4 @@ public class Sistema {
         System.out.println("\nEste sistema foi desenvolvido por Felipe Matheus Nogueira da Silva e Matheus Cipriani\n");
     }
 
-    private int[] novoJogo() {
-        int escolha = -1;
-
-        int vitoria = 0;
-        int dificuldade = 0;
-        int [] retorno = new int[2];
-
-        while(escolha != 0) {
-            escolha = menuNovoJogo();
-            dificuldade = escolha;
-            switch (escolha) {
-                case 1:
-                    CampoMinado campo1 = new CampoMinado(1, teclado);
-                    vitoria = campo1.vitoria;
-                    escolha = 0;
-                    break;
-                case 2:
-                    CampoMinado campo2 = new CampoMinado(2, teclado);
-                    vitoria = campo2.vitoria;
-                    escolha = 0;
-                    break;
-                case 3:
-                    CampoMinado campo3 = new CampoMinado(3, teclado);
-                    vitoria = campo3.vitoria;
-                    escolha = 0;
-                    break;
-                case -1:
-                    break;
-                default:
-                    System.out.println("\nTente mais uma vez");
-                    break;
-            }
-        }
-        retorno[0] = vitoria;
-        retorno[1] = dificuldade;
-        return retorno;
-    }
-
-    private int menuNovoJogo() {
-        System.out.println("---------------------------------");
-        System.out.println("1 - Fácil");
-        System.out.println("2 - Médio");
-        System.out.println("3 - Difícil");
-
-        try {
-            return Integer.parseInt(teclado.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("\nTente mais uma vez");
-            return -1;
-        }
-    }
 }
