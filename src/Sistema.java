@@ -75,13 +75,14 @@ public class Sistema implements ActionListener {
 
     private final Scanner teclado;
 
+    //Método de inicialização do jogo.
     public void iniciar() {
         int escolha = -1;
         while (escolha != 0) {
             escolha = menu();
             switch(escolha) {
                 case 1:
-                    final Date hoje = new Date();
+                    final Date hoje = new Date(); //Variável criada para guardar a data e instante em que o usuário iniciou o jogo.
                     int[] retornoJogo = novoJogo(); //Retorna na primeira posicao se foi vitoria e na segunda posicao a dificuldade
 
                     final SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -90,8 +91,8 @@ public class Sistema implements ActionListener {
                     final Duration duracao = Duration.ofMillis(new Date().getTime() - hoje.getTime());
                     final long hora = duracao.toHours();
                     final long minutos = duracao.toMinutes();
-                    final long segundos = duracao.toSeconds();
-                    final String tempo =  hora + ":" + minutos + ":" + segundos;
+                    final long segundos = duracao.getSeconds();
+                    final String tempo =  hora + ":" + minutos + ":" + segundos; //Duração do jogo
 
                     String vitoria;
                     if (retornoJogo[0] == 1){
@@ -146,66 +147,6 @@ public class Sistema implements ActionListener {
         }
     }
 
-    private void exibirHistorico(){
-        File file = new File("C:\\Users\\pankaj\\Desktop\\test.txt");
-        Scanner sc = null;
-        try {
-            sc = new Scanner(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        while (true){
-            assert sc != null;
-            if (!sc.hasNextLine()) break;
-            System.out.println(sc.nextLine());
-        }
-    }
-
-    private void limparHistorico() {
-        try {
-            FileWriter fw = new FileWriter("historico.txt");
-            fw.close();
-            System.out.println("Histórico apagado com sucesso.");
-        } catch (Exception e) {
-            System.out.println("Erro ao limpar arquivo");
-        }
-    }
-
-    private int menu() {
-        System.out.println("------------------------------------");
-        System.out.println("Menu principal");
-        System.out.println("1 - Novo jogo");
-        System.out.println("2 - Exibir histórico de vitórias");
-        System.out.println("3 - Limpar histórico");
-        System.out.println("4 - Créditos");
-        System.out.println("0 - Sair");
-
-        try {
-            return Integer.parseInt(teclado.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("\nTente mais uma vez");
-            return -1;
-        }
-    }
-
-    private int menuFinal() {
-        System.out.println("------------------------------------");
-        System.out.println("1 - Voltar para o Menu Principal");
-        System.out.println("0 - Sair");
-
-        try {
-            return Integer.parseInt(teclado.nextLine());
-        } catch (NumberFormatException e) {
-            System.out.println("\nTente mais uma vez");
-            return -1;
-        }
-    }
-
-    private void mostraCreditos() {
-        System.out.println("\nEste sistema foi desenvolvido por Felipe Matheus Nogueira da Silva e Matheus Cipriani\n");
-    }
-
     private int[] novoJogo() {
         int escolha = -1;
 
@@ -257,4 +198,65 @@ public class Sistema implements ActionListener {
             return -1;
         }
     }
+
+    private void exibirHistorico(){
+        File file = new File("historico.txt");
+        Scanner sc = null;
+        try {
+            sc = new Scanner(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Histórico: \n");
+        while (true){
+            assert sc != null;
+            if (!sc.hasNextLine()) break;
+            System.out.println(sc.nextLine());
+        }
+    }
+
+    private void limparHistorico() {
+        try {
+            FileWriter fw = new FileWriter("historico.txt");
+            fw.close();
+            System.out.println("Histórico apagado com sucesso.");
+        } catch (Exception e) {
+            System.out.println("Erro ao limpar arquivo");
+        }
+    }
+
+    private int menu() {
+        System.out.println("------------------------------------");
+        System.out.println("Menu principal");
+        System.out.println("1 - Novo jogo");
+        System.out.println("2 - Exibir histórico de vitórias");
+        System.out.println("3 - Limpar histórico");
+        System.out.println("4 - Créditos");
+        System.out.println("0 - Sair");
+
+        try {
+            return Integer.parseInt(teclado.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("\nTente mais uma vez");
+            return -1;
+        }
+    }
+
+    private int menuFinal() {
+        System.out.println("------------------------------------");
+        System.out.println("1 - Voltar para o Menu Principal");
+        System.out.println("0 - Sair");
+
+        try {
+            return Integer.parseInt(teclado.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("\nTente mais uma vez");
+            return -1;
+        }
+    }
+
+    private void mostraCreditos() {
+        System.out.println("\nEste sistema foi desenvolvido por Felipe Matheus Nogueira da Silva e Matheus Cipriani\n");
+    }
+
 }
