@@ -53,13 +53,13 @@ public class Sistema implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         switch (e.getActionCommand()) {
             case "Fácil":
-                new CampoMinado(1, null);
+                new CampoMinado(1);
                 break;
             case "Médio":
-                new CampoMinado(2, null);
+                new CampoMinado(2);
                 break;
             case "Difícil":
-                new CampoMinado(3, null);
+                new CampoMinado(3);
                 break;
             case "Historico":
                 System.out.println("AHAHAHHAHAAH");
@@ -159,18 +159,15 @@ public class Sistema implements ActionListener {
             dificuldade = escolha;
             switch (escolha) {
                 case 1:
-                    CampoMinado campo1 = new CampoMinado(1, teclado);
-                    vitoria = campo1.vitoria;
+                    CampoMinado campo1 = new CampoMinado(1);
                     escolha = 0;
                     break;
                 case 2:
-                    CampoMinado campo2 = new CampoMinado(2, teclado);
-                    vitoria = campo2.vitoria;
+                    CampoMinado campo2 = new CampoMinado(2);
                     escolha = 0;
                     break;
                 case 3:
-                    CampoMinado campo3 = new CampoMinado(3, teclado);
-                    vitoria = campo3.vitoria;
+                    CampoMinado campo3 = new CampoMinado(3);
                     escolha = 0;
                     break;
                 case -1:

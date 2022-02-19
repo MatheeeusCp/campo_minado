@@ -6,15 +6,16 @@ import java.util.Scanner;
 import java.util.SimpleTimeZone;
 
 public class CampoMinado implements ActionListener {
-
-    JFrame frame;
     int linhas;
     int colunas;
+    int numeroBombas;
+    JFrame frame;
+    JButton[][] botoes;
+    Quadrado[][] jogoReal;
 
-    public CampoMinado(int dificuldade, Scanner teclado) {
+    public CampoMinado(int dificuldade) {
         int largura;
         int altura;
-        this.teclado = teclado;
 
         switch (dificuldade) {
             case 1:
@@ -23,26 +24,26 @@ public class CampoMinado implements ActionListener {
                 colunas = 10;
                 largura = 500;
                 altura = 500;
+                botoes = new JButton[8][10];
                 this.jogoReal = new Quadrado[8][10];
-                this.tela = new Quadrado[8][10];
                 break;
             case 2:
                 this.numeroBombas = 40;
                 linhas = 14;
                 colunas = 18;
-                largura = 600;
-                altura = 600;
+                largura = 780;
+                altura = 780;
+                botoes = new JButton[14][18];
                 this.jogoReal = new Quadrado[14][18];
-                this.tela = new Quadrado[14][18];
                 break;
             default:
                 this.numeroBombas = 99;
                 linhas = 20;
                 colunas = 24;
-                largura = 700;
-                altura = 700;
+                largura = 1000;
+                altura = 1000;
+                botoes = new JButton[20][24];
                 this.jogoReal = new Quadrado[20][24];
-                this.tela = new Quadrado[20][24];
                 break;
         }
 
@@ -51,15 +52,13 @@ public class CampoMinado implements ActionListener {
         frame.setSize(largura, altura);
         frame.setLayout(new GridLayout(linhas, colunas));
 
-        for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < colunas; j++) {
-                JButton botao = new JButton();
-                botao.setActionCommand(i + ":" + j);
-                botao.setName(i + ":" + j);
-                botao.setLocation(new Point(i, j));
-                botao.addActionListener(this);
-                botao.setBackground(Color.gray);
-                frame.add(botao);
+        for (int i = 0; i < botoes.length; i++) {
+            for (int j = 0; j < botoes[0].length; j++) {
+                botoes[i][j] = new JButton();
+                botoes[i][j].setActionCommand(i + ":" + j);
+                botoes[i][j].addActionListener(this);
+                botoes[i][j].setBackground(Color.gray);
+                frame.add(botoes[i][j]);
             }
         }
 
@@ -71,66 +70,25 @@ public class CampoMinado implements ActionListener {
         int linha;
         int coluna;
 
-        JButton botao = (JButton) e.getSource();
-
         String[] valores = e.getActionCommand().split(":");
         linha = Integer.parseInt(valores[0]);
         coluna = Integer.parseInt(valores[1]);
 
-        verificarBombas(linha, coluna);
-
-        String valor = tela[linha][coluna].getValor();
-
-        frame.getContentPane().removeAll();
-        for (int i = 0; i < linhas; i++) {
-            for (int j = 0; j < colunas; j++) {
-                JButton novoBotao = new JButton();
-                novoBotao.setActionCommand(i + ":" + j);
-                novoBotao.addActionListener(this);
-                if (tela[linha][coluna].getValor().equals("#")) {
-                    novoBotao.setBackground(Color.gray);
-                } else {
-                    botao.setText(valor);
-                    botao.setBackground(Color.white);
-                }
-
-                frame.add(novoBotao);
-            }
+        if (jogoReal[linha][coluna].getValor().equals("*")) {
+            abrirCampo();
+        } else {
+            verificarBombas(linha, coluna);
         }
-        frame.repaint();
     }
 
-
-
-    int vitoria = 0;
-    private final Scanner teclado;
-    private final int numeroBombas;
-    private Quadrado[][] jogoReal; //Essa matriz será utilizada para desenvolver a lógica do jogo.
-    private final Quadrado[][] tela; //Essa m// atriz será a mostrada para o usuário.
-
-    private int ganhou = 0;
-
-    //Função que setta a matriz do campo minado para o usuário.
     private void iniciaJogo() {
-
-        System.out.println();
-
-        //Loop que setta a matriz 'tela' com '#'.
-        for (int i = 0; i < tela.length; i++) {
-            for (int j = 0; j < tela[0].length; j++) {
-                tela[i][j] = new Quadrado();
-                tela[i][j].setValor("#");
-            }
-        }
-        //Loop que setta a matriz 'jogo real' com ' '.
-        for (int i = 0; i < tela.length; i++) {
+        for (int i = 0; i < jogoReal.length; i++) {
             for (int j = 0; j < jogoReal[0].length; j++) {
                 jogoReal[i][j] = new Quadrado();
                 jogoReal[i][j].setValor(" ");
             }
         }
 
-        //Loop que setta na matriz 'jogo real' as bombas em posições aleatórias.
         for (int i = 0; i < numeroBombas; i++) {
             final int x = (int) (jogoReal.length * Math.random());
             final int y = (int) (jogoReal[0].length * Math.random());
@@ -139,130 +97,6 @@ public class CampoMinado implements ActionListener {
                 jogoReal[x][y].setValor("*");
             }
         }
-
-        menuJogo();
-    }
-
-    //Função que mostra a matrix settada anteriormente para o usuário.
-    private void mostraJogo() {
-        System.out.print("     ");
-        //Loop para colocar os números da coordenada x no topo da matriz.
-        for (int i = 0; i < tela[0].length; i++) {
-            if (i < 10) {
-                System.out.print("0" + i + "  ");
-            } else {
-                System.out.print(i + "  ");
-            }
-        }
-        System.out.println("\n   ---------------------------------------------------------------------------------------------");
-        //Loop para colocar os números da coordenada y no canto esquerdo da matriz.
-        for (int i = 0; i < tela.length; i++) {
-            if (i < 10) {
-                System.out.print("0" + i + " | ");
-            } else {
-                System.out.print(i + " | ");
-            }
-            //Loop que preenche a matriz para o usuário com '#'.
-            for (int j = 0; j < tela[0].length; j++) {
-                System.out.print(tela[i][j].getValor() + "   ");
-            }
-            System.out.println();
-        }
-    }
-
-    private void menuJogo() {
-        int linha = 0;
-        int coluna = 0;
-        int i = -1;
-        while (i != 0) {
-            mostraJogo();
-            System.out.println("\n-------------------------");
-
-            linha = menuLinha();
-            coluna = menuColuna();
-
-            final boolean validado = validaCampos(linha, coluna);
-
-
-            if (validado) {
-                if (jogoReal[linha][coluna].getValor().equals("*")) {
-                    vocePerdeu();
-                    i = 0;
-                } else {
-                    verificarBombas(linha, coluna);
-                    if (ganhou == (jogoReal.length * jogoReal[0].length - numeroBombas)) {
-                        voceGanhou();
-                        i = 0;
-                    }
-                }
-            } else {
-                System.out.println("Tente mais uma vez\n");
-            }
-        }
-    }
-
-    private void vocePerdeu() {
-        System.out.println("");
-        System.out.println("Você PERDEU!");
-        abrirCampo();
-        mostraJogo();
-    }
-
-    private void voceGanhou() {
-        vitoria = 1;
-        System.out.println("");
-        System.out.println("Você GANHOU!");
-        mostraJogo();
-    }
-
-    private int menuLinha() {
-        int linha;
-
-        System.out.println("Digite a linha:");
-        try {
-            linha = Integer.parseInt(teclado.nextLine());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-
-        return linha;
-    }
-
-    private int menuColuna() {
-        int coluna;
-
-        System.out.println("Digite a coluna:");
-        try {
-            coluna = Integer.parseInt(teclado.nextLine());
-        } catch (NumberFormatException e) {
-            return -1;
-        }
-
-        return coluna;
-    }
-
-    private boolean validaCampos(int linha, int coluna) {
-        if (linha == -1 && coluna == -1) {
-            System.out.println("Campos inválidos");
-            return false;
-        }
-
-        if (linha >= jogoReal.length || linha < 0) {
-            System.out.println("Linha inexistente");
-            return false;
-        }
-
-        if (coluna >= jogoReal[0].length || coluna < 0) {
-            System.out.println("Coluna inexistente");
-            return false;
-        }
-
-        if (jogoReal[linha][coluna].isValidado()) {
-            System.out.println("Coordenada já usada");
-            return false;
-        }
-
-        return true;
     }
 
     private void verificarBombas(int linha, int coluna) {
@@ -275,7 +109,6 @@ public class CampoMinado implements ActionListener {
         int maxLinha;
         int minColuna;
         int maxColuna;
-
 
         if (linha != 0 && linha != jogoReal.length - 1) {
             minLinha = linha - 1;
@@ -307,11 +140,11 @@ public class CampoMinado implements ActionListener {
             }
         }
 
-        tela[linha][coluna].setValor(String.valueOf(bombas));
-        tela[linha][coluna].setValidado(true);
         jogoReal[linha][coluna].setValor(String.valueOf(bombas));
         jogoReal[linha][coluna].setValidado(true);
-        ganhou++;
+
+        botoes[linha][coluna].setText(String.valueOf(bombas));
+        botoes[linha][coluna].setBackground(Color.white);
 
         if (bombas == 0) {
             for (int i = minLinha; i <= maxLinha; i++) {
@@ -327,63 +160,16 @@ public class CampoMinado implements ActionListener {
     }
 
     private void abrirCampo() {
-        for (int x = 0; x < jogoReal.length; x++) {
-            for (int y = 0; y < jogoReal[0].length; y++) {
+        for (int x = 0; x < botoes.length; x++) {
+            for (int y = 0; y < botoes[0].length; y++) {
                 if (jogoReal[x][y].getValor().equals("*")) {
-                    tela[x][y].setValor("*");
-                    continue;
+                    botoes[x][y].setBackground(Color.red);
+                    botoes[x][y].setIcon(new ImageIcon("images/mina-jogo.png"));
+                } else {
+                    botoes[x][y].setEnabled(false);
                 }
 
-                descobrirCampos(x, y);
             }
         }
-    }
-
-    private void descobrirCampos(int linha, int coluna) {
-        if (jogoReal[linha][coluna].isValidado()) {
-            return;
-        }
-
-        int bombas = 0;
-        int minLinha;
-        int maxLinha;
-        int minColuna;
-        int maxColuna;
-
-
-        if (linha != 0 && linha != jogoReal.length - 1) {
-            minLinha = linha - 1;
-            maxLinha = linha + 1;
-        } else if (linha == 0) {
-            minLinha = linha;
-            maxLinha = linha + 1;
-        } else {
-            minLinha = linha - 1;
-            maxLinha = linha;
-        }
-
-        if (coluna != 0 && coluna != jogoReal[0].length - 1) {
-            minColuna = coluna - 1;
-            maxColuna = coluna + 1;
-        } else if (coluna == 0) {
-            minColuna = coluna;
-            maxColuna = coluna + 1;
-        } else {
-            minColuna = coluna - 1;
-            maxColuna = coluna;
-        }
-
-        for (int i = minLinha; i <= maxLinha; i++) {
-            for (int j = minColuna; j <= maxColuna; j++) {
-                if (jogoReal[i][j].getValor().equals("*")) {
-                    bombas++;
-                }
-            }
-        }
-
-        tela[linha][coluna].setValor(String.valueOf(bombas));
-        tela[linha][coluna].setValidado(true);
-        jogoReal[linha][coluna].setValor(String.valueOf(bombas));
-        jogoReal[linha][coluna].setValidado(true);
     }
 }
