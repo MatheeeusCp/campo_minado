@@ -1,9 +1,12 @@
-import java.util.Scanner;
+import javax.swing.*;
 
 public class main {
     public static void main(String[] args) {
-        final Sistema sistema = new Sistema();
-        sistema.iniciar();
-
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                new Sistema();
+            }
+        });
     }
 }

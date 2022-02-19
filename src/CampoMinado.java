@@ -1,30 +1,107 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Scanner;
 import java.util.SimpleTimeZone;
 
-public class CampoMinado extends Sistema {
+public class CampoMinado implements ActionListener {
+
+    JFrame frame;
+    int linhas;
+    int colunas;
+
     public CampoMinado(int dificuldade, Scanner teclado) {
+        int largura;
+        int altura;
         this.teclado = teclado;
 
         switch (dificuldade) {
             case 1:
                 this.numeroBombas = 10;
+                linhas = 8;
+                colunas = 10;
+                largura = 500;
+                altura = 500;
                 this.jogoReal = new Quadrado[8][10];
                 this.tela = new Quadrado[8][10];
                 break;
             case 2:
                 this.numeroBombas = 40;
+                linhas = 14;
+                colunas = 18;
+                largura = 600;
+                altura = 600;
                 this.jogoReal = new Quadrado[14][18];
                 this.tela = new Quadrado[14][18];
                 break;
             default:
                 this.numeroBombas = 99;
+                linhas = 20;
+                colunas = 24;
+                largura = 700;
+                altura = 700;
                 this.jogoReal = new Quadrado[20][24];
                 this.tela = new Quadrado[20][24];
                 break;
         }
 
+        frame = new JFrame("Campo Minado");
+        frame.setVisible(true);
+        frame.setSize(largura, altura);
+        frame.setLayout(new GridLayout(linhas, colunas));
+
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                JButton botao = new JButton();
+                botao.setActionCommand(i + ":" + j);
+                botao.setName(i + ":" + j);
+                botao.setLocation(new Point(i, j));
+                botao.addActionListener(this);
+                botao.setBackground(Color.gray);
+                frame.add(botao);
+            }
+        }
+
         iniciaJogo();
     }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        int linha;
+        int coluna;
+
+        JButton botao = (JButton) e.getSource();
+
+        String[] valores = e.getActionCommand().split(":");
+        linha = Integer.parseInt(valores[0]);
+        coluna = Integer.parseInt(valores[1]);
+
+        verificarBombas(linha, coluna);
+
+        String valor = tela[linha][coluna].getValor();
+
+        frame.getContentPane().removeAll();
+        for (int i = 0; i < linhas; i++) {
+            for (int j = 0; j < colunas; j++) {
+                JButton novoBotao = new JButton();
+                novoBotao.setActionCommand(i + ":" + j);
+                novoBotao.addActionListener(this);
+                if (tela[linha][coluna].getValor().equals("#")) {
+                    novoBotao.setBackground(Color.gray);
+                } else {
+                    botao.setText(valor);
+                    botao.setBackground(Color.white);
+                }
+
+                frame.add(novoBotao);
+            }
+        }
+        frame.repaint();
+    }
+
+
+
     int vitoria = 0;
     private final Scanner teclado;
     private final int numeroBombas;
@@ -35,6 +112,7 @@ public class CampoMinado extends Sistema {
 
     //Função que setta a matriz do campo minado para o usuário.
     private void iniciaJogo() {
+
         System.out.println();
 
         //Loop que setta a matriz 'tela' com '#'.
