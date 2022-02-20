@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 public class Sobre implements ActionListener {
     public Sobre() {
         JFrame frame = new JFrame("Sobre");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
         frame.setSize(500, 500);
         frame.setLayout(new BorderLayout());

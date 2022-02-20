@@ -62,7 +62,7 @@ public class Sistema implements ActionListener {
                 new CampoMinado(3);
                 break;
             case "Historico":
-                System.out.println("AHAHAHHAHAAH");
+                new Historico();
                 break;
             case "Sobre":
                 new Sobre();
