@@ -1,7 +1,16 @@
+import database.Jogo;
+import database.JogoDAO;
+import database.JogoDAOJDBC;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.util.Date;
+import java.util.Random;
 import java.util.Scanner;
 import java.util.SimpleTimeZone;
 
@@ -12,10 +21,13 @@ public class CampoMinado implements ActionListener {
     JFrame frame;
     JButton[][] botoes;
     Quadrado[][] jogoReal;
+    int dificuldade;
+    final Date hoje = new Date(); //Variável criada para guardar a data e instante em que o usuário iniciou o jogo.
 
     public CampoMinado(int dificuldade) {
         int largura;
         int altura;
+        this.dificuldade = dificuldade;
 
         switch (dificuldade) {
             case 1:
@@ -146,6 +158,20 @@ public class CampoMinado implements ActionListener {
         botoes[linha][coluna].setText(String.valueOf(bombas));
         botoes[linha][coluna].setBackground(Color.white);
 
+        int cont = 0;
+
+        for (Quadrado[] quadrados : jogoReal) {
+            for (int j = 0; j < jogoReal[0].length; j++) {
+                if (quadrados[j].isValidado()) {
+                    cont++;
+                }
+            }
+        }
+
+        if (cont == (linhas * colunas - numeroBombas)){
+            abrirCampo();
+        }
+
         if (bombas == 0) {
             for (int i = minLinha; i <= maxLinha; i++) {
                 for (int j = minColuna; j <= maxColuna; j++) {
@@ -170,6 +196,23 @@ public class CampoMinado implements ActionListener {
                 }
 
             }
+        }
+        final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        final SimpleDateFormat horaFormat = new SimpleDateFormat("HH:mm:ss");
+
+        final Duration duracao = Duration.ofMillis(new Date().getTime() - hoje.getTime());
+        final long hora = duracao.toHours();
+        final long minutos = duracao.toMinutes();
+        final long segundos = duracao.getSeconds();
+        final String tempo =  hora + ":" + minutos + ":" + segundos; //Duração do jogo
+
+        try {
+            Jogo jogo = new Jogo(new Random().nextInt(9999), ""+dateFormat.format(hoje)+"",""+horaFormat.format(horaFormat.parse(tempo))+"", this.dificuldade);
+            JogoDAO dao = new JogoDAOJDBC();
+            dao.inserirJogo(jogo);
+
+        } catch (ParseException e) {
+            e.printStackTrace();
         }
     }
 }
