@@ -9,11 +9,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 
 public class Historico implements ActionListener {
-
-    //Aqui é uma lista do Objeto do historico
-    String[] data = {};
-    String[] duracao = {};
-
     JogoDAO dao = new JogoDAOJDBC();
     ArrayList<Jogo> jogos = dao.listar(4);
 
@@ -54,7 +49,6 @@ public class Historico implements ActionListener {
         JComboBox cb = (JComboBox) e.getSource();
         String nivel = (String) cb.getSelectedItem();
 
-        // Aqui tu limpa a lista "historico" e coloca os devidos valores
         switch(nivel) {
             case "Fácil":
                 jogos = dao.listar(1);
